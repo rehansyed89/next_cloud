@@ -1,10 +1,12 @@
 "use server";
 
-import { createAdminClient } from "@/lib/appwrite";
+import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { ID, Query } from "node-appwrite";
 import { parseStringify } from "@/lib/helpers";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { avatarPlaceholderUrl } from "@/constants";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
@@ -16,6 +18,7 @@ const getUserByEmail = async (email: string) => {
 
   return result.total > 0 ? result.documents[0] : null;
 };
+
 const handleError = (error: unknown, message: string) => {
   console.log(error, message);
   throw error;
@@ -55,8 +58,7 @@ export const createAccount = async ({
       {
         fullName,
         email,
-        avatar:
-          "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg",
+        avatar: avatarPlaceholderUrl,
         accountId,
       },
     );
@@ -86,5 +88,36 @@ export const verifySecret = async ({
     return parseStringify({ sessionId: session.$id });
   } catch (error) {
     handleError(error, "Failed to verify OTP");
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const { databases, account } = await createSessionClient();
+
+    const result = await account.get();
+    const user = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal("accountId", result.$id)],
+    );
+
+    if (user.total <= 0) return null;
+
+    return parseStringify(user.documents[0]);
+  } catch (e) {
+    handleError(e, "Failed to get current user");
+  }
+};
+
+export const signOut = async () => {
+  const { account } = await createAdminClient();
+  try {
+    await account.deleteSession("current");
+    (await cookies()).delete("appwrite-session");
+  } catch (error) {
+    handleError(error, "Failed to sign out user");
+  } finally {
+    redirect("/sign-in");
   }
 };
