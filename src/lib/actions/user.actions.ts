@@ -111,7 +111,7 @@ export const getCurrentUser = async () => {
 };
 
 export const signOut = async () => {
-  const { account } = await createAdminClient();
+  const { account } = await createSessionClient();
   try {
     await account.deleteSession("current");
     (await cookies()).delete("appwrite-session");
@@ -119,5 +119,18 @@ export const signOut = async () => {
     handleError(error, "Failed to sign out user");
   } finally {
     redirect("/sign-in");
+  }
+};
+
+export const signIn = async ({ email }: { email: string }) => {
+  try {
+    const existingUser = await getUserByEmail(email);
+    if (existingUser) {
+      await sendEmailOTP({ email });
+      return parseStringify({ accountId: existingUser.accountId });
+    }
+    return parseStringify({ accountId: null, error: "user not found" });
+  } catch (error) {
+    handleError(error, "Failed to sign in");
   }
 };
