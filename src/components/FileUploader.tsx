@@ -18,12 +18,12 @@ interface Props {
 }
 
 const FileUploader = ({ ownerId, accountId, className }: Props) => {
-  const path = usePathname();
-  const { toast } = useToast();
   const [files, setFiles] = useState<File[]>([]);
-
+  const { toast } = useToast();
+  const path = usePathname();
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
+      // Do something with the files
       setFiles(acceptedFiles);
 
       const uploadPromises = acceptedFiles.map(async (file) => {
@@ -35,15 +35,15 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
           return toast({
             description: (
               <p className="body-2 text-white">
-                <span className="font-semibold">{file.name}</span> is too large.
-                Max file size is 50MB.
+                <span className="font-semibold"> {file.name}</span> is too
+                large. Maximum size is 50MB
               </p>
             ),
             className: "error-toast",
           });
         }
 
-        return uploadFile({ file, ownerId, accountId, path }).then(
+        return uploadFile({ file, accountId, ownerId, path }).then(
           (uploadedFile) => {
             if (uploadedFile) {
               setFiles((prevFiles) =>
@@ -56,7 +56,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
 
       await Promise.all(uploadPromises);
     },
-    [ownerId, accountId, path],
+    [accountId, ownerId, path],
   );
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
@@ -74,7 +74,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
       <Button type="button" className={cn("uploader-button", className)}>
         <Image
           src="/assets/icons/upload.svg"
-          alt="pload button"
+          alt="uplaod"
           height={24}
           width={24}
         />
