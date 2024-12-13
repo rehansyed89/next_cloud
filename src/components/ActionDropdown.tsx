@@ -4,11 +4,9 @@ import { Models } from "node-appwrite";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -19,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { actionsDropdownItems } from "@/constants";
 import Link from "next/link";
@@ -29,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { renameFile, updateFileUsers } from "@/lib/actions/file.actions";
 import { usePathname } from "next/navigation";
 import { FileDetails, ShareInput } from "@/components/ActionsModalContent";
+import { getUsersByEmails } from "@/lib/actions/user.actions";
 
 export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +36,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState<string[]>([]);
+  const [usersData, setUsersData] = useState<User[]>([]);
 
   const path = usePathname();
 
@@ -83,6 +83,21 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
     closeAllModals();
   };
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const normalizedEmails = file.users.map(
+        (email: string) => email.trim().toLowerCase(), // Normalize email
+      );
+      const users = await getUsersByEmails(normalizedEmails);
+      console.log(users);
+      setUsersData(users); // Users should include avatar and email
+    };
+
+    if (action?.value === "share") {
+      fetchUsers();
+    }
+  }, [action?.value, file.users]);
+
   const renderDialogContent = () => {
     if (!action) return null;
 
@@ -106,6 +121,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
               file={file}
               onInputChange={setEmails}
               onRemove={handleRemoveUser}
+              usersData={usersData}
             />
           )}
           {value === "delete" && <p>delete it</p>}

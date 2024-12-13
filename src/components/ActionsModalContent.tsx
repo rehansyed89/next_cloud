@@ -42,9 +42,15 @@ interface Props {
   file: Models.Document;
   onInputChange: React.Dispatch<React.SetStateAction<string[]>>;
   onRemove: (email: string) => void;
+  usersData: User[];
 }
 
-export const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
+export const ShareInput = ({
+  file,
+  onInputChange,
+  onRemove,
+  usersData,
+}: Props) => {
   return (
     <>
       <ImageThumbnail file={file} />
@@ -66,15 +72,22 @@ export const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
             </p>
           </div>
           <ul className="pt-2">
-            {file.users.map((email: string) => (
-              <li
-                key={email}
+            {usersData.map((user) => (
+              <div
+                key={user.email}
                 className="flex items-center justify-between gap-2"
               >
-                <p className="subtitle-2"> {email}</p>
+                <Image
+                  src={user.avatar || "/assets/images/files.png"} // Assuming `avatar` contains the URL
+                  alt={`${user.email}'s avatar`}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+                <p className="subtitle-2"> {user.fullName}</p>
                 <Button
                   className="share-remove-user"
-                  onClick={() => onRemove(email)}
+                  onClick={() => onRemove(user.email)}
                 >
                   <Image
                     src="/assets/icons/remove.svg"
@@ -84,7 +97,7 @@ export const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
                     className="remove-icon"
                   />
                 </Button>
-              </li>
+              </div>
             ))}
           </ul>
         </div>
