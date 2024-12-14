@@ -74,9 +74,3 @@ declare interface ShareInputProps {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: (email: string) => void;
 }
-
-declare interface User {
-  fullName: string;
-  email: string;
-  avatar: string | null;
-}

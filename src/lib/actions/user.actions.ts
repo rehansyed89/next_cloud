@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { avatarPlaceholderUrl } from "@/constants";
 
-export const getUserByEmail = async (email: string) => {
+const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
   const result = await databases.listDocuments(
     appwriteConfig.databaseId,
@@ -17,35 +17,6 @@ export const getUserByEmail = async (email: string) => {
   );
 
   return result.total > 0 ? result.documents[0] : null;
-};
-
-export const getUsersByEmails = async (emails: string[]): Promise<User[]> => {
-  const { databases } = await createAdminClient();
-  try {
-    const userPromises = emails.map(async (email) => {
-      const response = await databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.usersCollectionId,
-        [Query.equal("email", email)],
-      );
-      if (response.documents.length > 0) {
-        return {
-          email: response.documents[0].email,
-          avatar: response.documents[0].avatar || null,
-          fullName: response.documents[0].fullName || null,
-        };
-      }
-      return null;
-    });
-    // Wait for all the promises to resolve
-    const users = await Promise.all(userPromises);
-
-    // Filter out any null values (for emails not found)
-    return users.filter((user) => user !== null);
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-    return [];
-  }
 };
 
 const handleError = (error: unknown, message: string) => {
