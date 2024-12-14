@@ -78,8 +78,8 @@ const createQueries = (
     ]),
   ];
 
-  /* if (types.length > 0) queries.push(Query.equal("type", types));
-   if (searchText) queries.push(Query.contains("name", searchText));
+  if (types.length > 0) queries.push(Query.equal("type", types));
+  /* if (searchText) queries.push(Query.contains("name", searchText));
   if (limit) queries.push(Query.limit(limit));
 
   if (sort) {
@@ -166,5 +166,29 @@ export const updateFileUsers = async ({
     return parseStringify(updatedFile);
   } catch (error) {
     handleError(error, "Failed to rename the file.");
+  }
+};
+
+export const deleteFile = async ({
+  fileId,
+  bucketFileId,
+  path,
+}: DeleteFileProps) => {
+  const { databases, storage } = await createAdminClient();
+
+  try {
+    const deletedFile = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesCollectionId,
+      fileId,
+    );
+
+    if (deletedFile) {
+      await storage.deleteFile(appwriteConfig.bucketId, bucketFileId);
+    }
+    revalidatePath(path);
+    return parseStringify({ status: "success" });
+  } catch (error) {
+    handleError(error, "Failed to delete the file.");
   }
 };
