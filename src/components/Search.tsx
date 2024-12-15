@@ -6,9 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { getFiles } from "@/lib/actions/file.actions";
 import { Models } from "node-appwrite";
-import { map } from "zod";
 import Thumbnail from "@/components/Thumbnail";
-import { getFileType } from "@/lib/utils";
 import { FormatDateTime } from "@/components/FormatDateTime";
 import { useDebounce } from "use-debounce";
 
@@ -20,7 +18,7 @@ const Search = () => {
   const searchQuery = searchParams.get("query") || "";
   const [results, setResults] = useState<Models.Document[]>([]);
   const router = useRouter();
-  const [debouncedQuery] = useDebounce(query, 3000);
+  const [debouncedQuery] = useDebounce(query, 300);
 
   useEffect(() => {
     const fetchFiles = async () => {
