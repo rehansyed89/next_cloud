@@ -22,7 +22,7 @@ const Dashboard = async () => {
       <section>
         <Chart used={totalSpace.used} />
         <ul className="dashboard-summary-list">
-          {usageSummary.map((summary) => (
+          {Object.entries(usageSummary).map(([, summary]) => (
             <Link
               href={summary.url}
               key={summary.title}

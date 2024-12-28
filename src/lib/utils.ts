@@ -180,22 +180,22 @@ export const constructDownloadUrl = (bucketFileId: string) => {
 
 // DASHBOARD UTILS
 export const getUsageSummary = (totalSpace: any) => {
-  return [
-    {
+  return {
+    documents: {
       title: "Documents",
       size: totalSpace.document.size,
       latestDate: totalSpace.document.latestDate,
       icon: "/assets/icons/file-document-light.svg",
       url: "/documents",
     },
-    {
+    images: {
       title: "Images",
       size: totalSpace.image.size,
       latestDate: totalSpace.image.latestDate,
       icon: "/assets/icons/file-image-light.svg",
       url: "/images",
     },
-    {
+    media: {
       title: "Media",
       size: totalSpace.video.size + totalSpace.audio.size,
       latestDate:
@@ -205,16 +205,26 @@ export const getUsageSummary = (totalSpace: any) => {
       icon: "/assets/icons/file-video-light.svg",
       url: "/media",
     },
-    {
+    others: {
       title: "Others",
       size: totalSpace.other.size,
       latestDate: totalSpace.other.latestDate,
       icon: "/assets/icons/file-other-light.svg",
       url: "/others",
     },
-  ];
+  };
 };
 
+export const getFileSizeByType = ({
+  totalSpace,
+  type,
+}: {
+  totalSpace: any;
+  type: string;
+}) => {
+  const usageSummary = getUsageSummary(totalSpace);
+  return convertFileSize(usageSummary[type as keyof typeof usageSummary].size);
+};
 export const getFileTypesParams = (type: string) => {
   switch (type) {
     case "documents":
