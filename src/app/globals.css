@@ -302,6 +302,9 @@
     .form-title {
         @apply h1 text-center text-light-100 md:text-left !important;
     }
+    .form-title-dark {
+        @apply h1 text-center text-cyan-100 md:text-left !important;
+    }
     .form-submit-button {
         @apply primary-btn h-[66px] !important;
     }
