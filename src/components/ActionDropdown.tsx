@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   deleteFile,
+  fetchCurrentFileUsers,
   renameFile,
   updateFileUsers,
 } from "@/lib/actions/file.actions";
@@ -53,7 +54,6 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
     if (!action) return null;
     setIsLoading(true);
     let success = false;
-
     const actions = {
       rename: () =>
         renameFile({
@@ -62,7 +62,15 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
           extension: file.extension,
           path,
         }),
-      share: () => updateFileUsers({ fileId: file.$id, emails, path }),
+      share: async () => {
+        const currentFileUsers = await fetchCurrentFileUsers(file.bucketFileId);
+        const updatedEmails = [...new Set([...currentFileUsers, ...emails])];
+        return updateFileUsers({
+          fileId: file.$id,
+          emails: updatedEmails,
+          path,
+        });
+      },
       delete: () =>
         deleteFile({ fileId: file.$id, bucketFileId: file.bucketFileId, path }),
     };
@@ -74,16 +82,19 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   };
 
   const handleRemoveUser = async (email: string) => {
+    console.log("remove");
+    console.log(emails);
     const updatedEmails = emails.filter((e) => e !== email);
+    console.log(updatedEmails);
 
-    const success = await updateFileUsers({
+    /* const success = await updateFileUsers({
       fileId: file.$id,
       emails: updatedEmails,
       path,
     });
 
     if (success) setEmails(updatedEmails);
-    closeAllModals();
+    closeAllModals(); */
   };
 
   const renderDialogContent = () => {

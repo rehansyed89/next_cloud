@@ -169,6 +169,21 @@ export const updateFileUsers = async ({
   }
 };
 
+export const fetchCurrentFileUsers = async (bucketFileId: string) => {
+  try {
+    const { databases } = await createAdminClient();
+    const file = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesCollectionId,
+      [Query.equal("bucketFileId", [bucketFileId])],
+    );
+    if (file.total <= 0) return null;
+    return parseStringify(file.documents[0].users);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const deleteFile = async ({
   fileId,
   bucketFileId,
