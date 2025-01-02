@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { actionsDropdownItems } from "@/constants";
 import Link from "next/link";
@@ -40,7 +40,6 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState<string[]>([]);
-
   const path = usePathname();
 
   const closeAllModals = () => {
@@ -65,6 +64,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
       share: async () => {
         const currentFileUsers = await fetchCurrentFileUsers(file.bucketFileId);
         const updatedEmails = [...new Set([...currentFileUsers, ...emails])];
+
         return updateFileUsers({
           fileId: file.$id,
           emails: updatedEmails,
@@ -82,19 +82,16 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   };
 
   const handleRemoveUser = async (email: string) => {
-    console.log("remove");
-    console.log(emails);
-    const updatedEmails = emails.filter((e) => e !== email);
-    console.log(updatedEmails);
+    const updatedEmails = file.users.filter((e) => e !== email);
 
-    /* const success = await updateFileUsers({
+    const success = await updateFileUsers({
       fileId: file.$id,
       emails: updatedEmails,
       path,
     });
 
     if (success) setEmails(updatedEmails);
-    closeAllModals(); */
+    closeAllModals();
   };
 
   const renderDialogContent = () => {
