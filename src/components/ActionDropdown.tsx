@@ -40,6 +40,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState<string[]>([]);
+
   const path = usePathname();
 
   const closeAllModals = () => {
@@ -53,6 +54,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
     if (!action) return null;
     setIsLoading(true);
     let success = false;
+
     const actions = {
       rename: () =>
         renameFile({
@@ -82,7 +84,7 @@ export const ActionDropdown = ({ file }: { file: Models.Document }) => {
   };
 
   const handleRemoveUser = async (email: string) => {
-    const updatedEmails = file.users.filter((e) => e !== email);
+    const updatedEmails = file.users.filter((e: string) => e !== email);
 
     const success = await updateFileUsers({
       fileId: file.$id,

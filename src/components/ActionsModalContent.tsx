@@ -1,13 +1,10 @@
-"use client";
 import { Models } from "node-appwrite";
 import Thumbnail from "@/components/Thumbnail";
 import { FormatDateTime } from "@/components/FormatDateTime";
 import { convertFileSize, formatDateTime } from "@/lib/utils";
-import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useDebounce } from "use-debounce";
 
 const ImageThumbnail = ({ file }: { file: Models.Document }) => (
   <div className="file-details-thumbnail">
@@ -42,7 +39,7 @@ export const FileDetails = ({ file }: { file: Models.Document }) => {
 
 interface Props {
   file: Models.Document;
-  onInputChange: (newEmails: string[]) => void;
+  onInputChange: React.Dispatch<React.SetStateAction<string[]>>;
   onRemove: (email: string) => void;
 }
 
